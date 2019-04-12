@@ -16,3 +16,15 @@ class ContactListSerializer(serializers.Serializer):
     phone_no = serializers.CharField(max_length=20)
     user = UserSerializer()
     groups = GroupSerializer(many=True)
+
+class TagSerializer(serializers.Serializer):
+    name =  serializers.CharField(max_length=255)
+    user =  UserSerializer()
+
+class TemplateListSerializer(serializers.Serializer):
+    name = serializers.CharField(max_length=255)
+    body = serializers.CharField()
+    tags = TagSerializer(many=True)
+
+    
+
