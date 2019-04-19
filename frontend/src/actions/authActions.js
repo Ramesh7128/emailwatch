@@ -41,8 +41,28 @@ export const authLogin = (email, password) => {
         axios.post(constURL.authLoginURL, {
             "user": {
                 "email": email,
-                "password": password
+                "password": password,
             }
+        })
+            .then((res) => {
+                const token = res.data.user.token;
+                const username = res.data.user.username;
+                localStorage.setItem('token', token);
+                dispatch(authSuccess(token, username));
+            })
+            .catch((error) => {
+                localStorage.removeItem('token');
+                dispatch(authFail(error));
+            });
+    }
+}
+
+export const socialauthLogin = (code, provider) => {
+    return dispatch => {
+        dispatch(authStart());
+        axios.post(constURL.socialLoginURL, {
+            "code": code,
+            "provider": provider
         })
             .then((res) => {
                 const token = res.data.user.token;

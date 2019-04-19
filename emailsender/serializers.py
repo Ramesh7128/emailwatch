@@ -17,6 +17,17 @@ class ContactListSerializer(serializers.Serializer):
     user = UserSerializer()
     groups = GroupSerializer(many=True)
 
+class SentEmailListSerailizer(serializers.Serializer):
+    receiver = serializers.CharField(max_length=50)
+    subject = serializers.CharField(max_length=200)
+    body = serializers.CharField(max_length=1000)
+    user = UserSerializer()
+    status = serializers.CharField(max_length=100)
+    read_status = serializers.CharField(max_length=100)
+    read_date = serializers.DateTimeField()
+    tracker_id = serializers.CharField(max_length=100)
+    creation_date = serializers.DateTimeField()
+
 class TagSerializer(serializers.Serializer):
     name =  serializers.CharField(max_length=255)
     user =  UserSerializer()

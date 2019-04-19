@@ -9,6 +9,13 @@ class Dashboard extends Component {
             navbar: 'Contacts'
         }
         this.handleClick = this.handleClick.bind(this);
+        this.handleStateChange = this.handleStateChange.bind(this);
+    }
+
+    handleStateChange(section) {
+        this.setState({
+            navbar: section
+        });
     }
 
     handleClick(event) {
@@ -34,7 +41,7 @@ class Dashboard extends Component {
                     </div>
                 </div>
                 <div className='main-content-section'>
-                    {navContent(this.state)}
+                    {navContent(this.state, this.handleStateChange)}
                 </div>
             </div>
         );

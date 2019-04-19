@@ -47,3 +47,19 @@ class EMailSent(models.Model):
     def __str__(self):
         return self.receiver
 
+
+class SentEmail(models.Model):
+    receiver = models.CharField(max_length=50)
+    subject = models.CharField(max_length=200)
+    body = models.TextField()
+    status = models.CharField(max_length=200)
+    user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
+    creation_date = models.DateTimeField(auto_now_add=True)
+    read_status = models.CharField(max_length=30)
+    read_date = models.DateTimeField(null=True)
+    tracker_id = models.CharField(max_length=50, null=True)
+
+    def __str_(self):
+        return self.receiver
+
+

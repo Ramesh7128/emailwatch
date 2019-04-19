@@ -324,6 +324,16 @@ a {
   border-bottom: 4px solid #000;
 }
 
+.heading-form-underline {
+  padding-bottom: 10px;
+  margin-bottom: 10px;
+  border-bottom: 4px solid white;
+}
+
+.email-form-heading {
+  margin: 10px;
+}
+
 /* .add-contact-form-section {
   width: 340px;
 } */

@@ -7,7 +7,7 @@ import SignUpForm from './SignUpForm';
 import Content from './Content';
 import Header from './Header';
 import { connect } from 'react-redux';
-import { tokenAuthentication } from '../actions/authActions'
+import { tokenAuthentication } from '../actions/authActions';
 
 
 class App extends Component {
@@ -26,7 +26,9 @@ class App extends Component {
             <Route exact path="/" component={Content} />
             <Route path="/login" component={LoginForm} />
             <Route path="/signup" component={SignUpForm} />
-            {/* <Route path="/category/:id" component={Content} /> */}
+            {/* <Route path="/sentemails" render={(routeProps)=> {
+              return <Content {...routeProps} navbar='SentEmail' />
+            }} /> */}
           </Switch>
           <div className='footer-section'>
             Made with <span>&#9829;</span> in <a href='https://altcampus.io/'>altCAMPUS</a>

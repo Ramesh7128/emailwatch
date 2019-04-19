@@ -1,5 +1,5 @@
 from django.shortcuts import render
-
+import requests
 from requests.exceptions import HTTPError
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.decorators import api_view, permission_classes
@@ -8,11 +8,19 @@ from rest_framework import serializers
 from rest_framework import status
 from authentication.renderers import UserJSONRenderer
 
+from emailsender.creds import GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET
+from emailsender.constants import GOOGLE_GET_TOKEN_URL, GOOGLE_TOKEN_INFO_URL
+
 from rest_framework.response import Response
 from rest_framework.decorators import api_view
 from rest_framework.views import APIView
 from rest_framework.generics import RetrieveUpdateAPIView
-from authentication.serializers import RegisterationSerializer, UserSerializer, LoginSerializer
+from authentication.serializers import (
+    RegisterationSerializer,
+    UserSerializer,
+    LoginSerializer,
+    SocialRegisterationLoginSerializer
+)
 
 
 # Create your views here.
@@ -23,7 +31,6 @@ class RegisterationAPIView(APIView):
     renderer_classes = (UserJSONRenderer,)
 
     def post(self, request):
-        print(request.data)
         user = request.data.get('user', {})
         serializer = self.serializer_class(data=user)
         serializer.is_valid(raise_exception=True)
@@ -65,3 +72,38 @@ class UserRetreiveUpdateView(RetrieveUpdateAPIView):
         serializer.is_valid(raise_exception=True)
         serializer.save()
         return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+class SocialLoginRegisterationAPIView(APIView):
+    # allow any user without authentication to access this api view.
+    permission_classes = (AllowAny,)
+    renderer_classes = (UserJSONRenderer,)
+
+    def post(self, request):
+        code = request.data.get('code', "")
+        provider = request.data.get('provider', '')
+        # get access token and refresh token
+        payload = { 
+            "code": code,
+            "client_id": GOOGLE_CLIENT_ID,
+            "client_secret": GOOGLE_CLIENT_SECRET,
+            "redirect_uri": 'http://localhost:3000',
+            "grant_type": "authorization_code"
+        }
+        res = requests.post(GOOGLE_GET_TOKEN_URL, data=payload)
+        access_token = res.json()['access_token']
+        refresh_token = res.json()['refresh_token']
+        res = requests.get(GOOGLE_TOKEN_INFO_URL % access_token)
+        email = res.json()['email']
+        payload = {
+            "access_token": access_token,
+            "refresh_token": refresh_token,
+            "email": email
+        }
+        serializer = SocialRegisterationLoginSerializer(data=payload)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
+        
+        
+        

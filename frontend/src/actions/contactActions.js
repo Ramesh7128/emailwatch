@@ -12,7 +12,7 @@ export function createContact(data) {
     let token = localStorage.getItem('token', '');
     let url = constURL.contactCreateListURL;
     return function (dispatch) {
-        return new Promise(function(resolve, reject){
+        return new Promise(function (resolve, reject) {
             dispatch({ type: CREATE_CONTACT_START });
             axios.post(url, data, { headers: { Authorization: `Token ${token}` } })
                 .then((response) => {

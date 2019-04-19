@@ -44,3 +44,7 @@ class JWTAuthentication(authentication.BaseAuthentication):
             raise exceptions.AuthenticationFailed(msg)
 
         return (user, token)
+
+class SocialJWTAuthentication(authentication.BaseAuthentication):
+    authentication_header_prefix = 'Token'
+    

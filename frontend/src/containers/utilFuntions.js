@@ -2,8 +2,10 @@ import React, { Component } from 'react';
 import Contacts from './Contacts'
 import Groups from './Groups';
 import Templates from './Templates';
+import NewEmail from './NewEmail';
+import SentEmail from './SentEmail'
 
-export function navContent(state) {
+export function navContent(state, stateChange) {
     switch (state.navbar) {
         case 'Contacts':
             return (
@@ -15,9 +17,7 @@ export function navContent(state) {
             );
         case 'SentEmail':
             return (
-                <div>
-                    List of sent Emails
-                </div>
+                <SentEmail />
             );
         case 'Template':
             return (
@@ -25,9 +25,7 @@ export function navContent(state) {
             );
         case 'NewEmail':
             return (
-                <div>
-                    New Email form.
-                </div>
+                <NewEmail handleStateChange={stateChange} />
             )
         default:
             return (

@@ -3,9 +3,33 @@ from authentication.models import User
 from django.contrib.auth import authenticate
 
 
+class SocialRegisterationLoginSerializer(serializers.Serializer):
+    """
+    Seraializer  for reqisteration/login a new user.
+    """
+    access_token = serializers.CharField(
+        allow_blank=False,
+        trim_whitespace=True,
+        write_only=True
+    )
+    refresh_token = serializers.CharField(
+        allow_blank=False,
+        trim_whitespace=True,
+        write_only=True
+    )
+    email = serializers.CharField()
+    token = serializers.CharField(allow_blank=True, read_only=True)
+    username = serializers.CharField(allow_blank=True, read_only=True)
+
+    def create(self, validated_data):
+        # validate the token sent with the email sent.
+        print(validated_data, 'inside serializer')
+        return User.objects.creat_social_user(**validated_data)
+
+
 class RegisterationSerializer(serializers.ModelSerializer):
     """
-    Serializer to for registeration request and create a new user.
+    Serializer for registeration request and create a new user.
     """
     password = serializers.CharField(
         max_length=200,
@@ -34,7 +58,6 @@ class LoginSerializer(serializers.Serializer):
     def validate(self, data):
         # The 'validate' method is where we make sure that the user.
         # the validate method is where we make sure that the user is a valid user.
-
         email = data.get('email', None)
         password = data.get('password', None)
 
@@ -48,7 +71,8 @@ class LoginSerializer(serializers.Serializer):
 
         user = authenticate(username=email, password=password)
         if user is None:
-            raise serializers.ValidationError('User credentials not matching')
+            raise serializers.ValidationError(
+                'User credentials not matching')
 
         if not user.is_active:
             raise serializers.ValidationError('User has been deactivated')

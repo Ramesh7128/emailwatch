@@ -26,6 +26,29 @@ class UserManger(BaseUserManager):
         user.save()
         return user
 
+    def creat_social_user(self, username=None, email=None, password=None, access_token=None, refresh_token=None):
+        """
+        Create a user object for social login users.
+        """
+        if username is None:
+            username = email.split('@')[0]
+        if email is None:
+            raise TypeError('user must have an email')
+        try:
+            user, created = self.model.objects.get_or_create(email=self.normalize_email(email))
+            if created:
+                user.username = username
+                password = User.objects.make_random_password()
+                user.set_password(password)
+                user.save()
+            user_creds, created = UserSocialCredentials.objects.get_or_create(user=user)
+            user_creds.access_token = access_token
+            user_creds.refresh_token = refresh_token
+            user_creds.save()
+            return user
+        except Exception as error:
+            print(error)
+
     def create_superuser(self, username, email, password):
         if password is None:
             raise TypeError('Superusers must have a password.')
@@ -91,3 +114,12 @@ class User(AbstractBaseUser, PermissionsMixin):
         }, settings.SECRET_KEY, algorithm='HS256')
 
         return token.decode('utf-8')
+
+
+class UserSocialCredentials(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    access_token = models.CharField(max_length=200)
+    refresh_token = models.CharField(max_length=200)
+
+    def __str__(self):
+        return self.user.email

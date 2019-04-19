@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/2.1/ref/settings/
 """
 
 import os
+from emailsender.creds import DJANGO_SECRET
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -20,12 +21,12 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # See https://docs.djangoproject.com/en/2.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = '&&75tk&162#62^ri(yln#j(5vd-6)jw88n%=fy6b_*$9w6a6v4'
+SECRET_KEY = DJANGO_SECRET
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
 # custom user settings.
 AUTH_USER_MODEL = 'authentication.User'
@@ -51,6 +52,7 @@ INSTALLED_APPS = [
     'corsheaders',
     'authentication',
     'emailsender',
+    'sslserver'
 ]
 
 MIDDLEWARE = [

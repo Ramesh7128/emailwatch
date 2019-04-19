@@ -1,21 +1,30 @@
 import React, { Component } from 'react';
 import { Link, Redirect } from 'react-router-dom'
-import { authLogin, authLogout } from '../actions/authActions';
+import { authLogin, authLogout, socialauthLogin } from '../actions/authActions';
+import { GoogleLogin } from 'react-google-login';
 import { connect } from 'react-redux';
+import axios from 'axios';
 
 class LoginForm extends Component {
     constructor(props) {
         super(props);
         this.state = {
             'email': '',
-            'password': ''
+            'password': '',
         };
         this.handleSubmit = this.handleSubmit.bind(this);
         this.handleInput = this.handleInput.bind(this);
+        this.responseGoogle = this.responseGoogle.bind(this);
     }
 
     componentDidMount() {
         this.props.LogoutAuth();
+    }
+
+    responseGoogle(response) {
+        console.log(response);
+        let code = response.code;
+        this.props.socialAuthLogin(code, 'google');
     }
 
     handleSubmit = event => {
@@ -71,6 +80,17 @@ class LoginForm extends Component {
                                 />
                             </div>
                         </form>
+                        <GoogleLogin
+                            clientId="705813183307-hminde5i1ejhm790gl6t2ct0j6n7vft0.apps.googleusercontent.com"
+                            buttonText="Login"
+                            scope="https://mail.google.com/ email profile"
+                            responseType='code'
+                            onSuccess={this.responseGoogle}
+                            onFailure={this.responseGoogle}
+                            accessType="offline"
+                            prompt='consent'
+                            cookiePolicy={'single_host_origin'}
+                        />
                     </div>
                     <div className='signup-link'>
                         <Link to="/signup"><div>Signup</div></Link>
@@ -84,6 +104,7 @@ class LoginForm extends Component {
 const mapDispatchToProps = (dispatch, ownProps) => {
     return {
         LoginAuth: (email, password) => dispatch(authLogin(email, password)),
+        socialAuthLogin: (email, token, provider) => dispatch(socialauthLogin(email, token, provider)),
         LogoutAuth: () => dispatch(authLogout())
     }
 }
