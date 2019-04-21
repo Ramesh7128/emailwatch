@@ -27,6 +27,12 @@ export function navContent(state, stateChange) {
             return (
                 <NewEmail handleStateChange={stateChange} />
             )
+        case 'Analytics':
+            return (
+                <div>
+                    Analytics.
+                </div>
+            )
         default:
             return (
                 <Contacts />

@@ -1,6 +1,6 @@
 // development setup
-// export const baseUrl = 'https://localhost:8000';
-export const baseUrl = 'https://eef000ec.ngrok.io'
+// export const baseUrl = 'http://localhost:8000';
+export const baseUrl = 'https://7241f427.ngrok.io';
 
 // production setup
 // export const baseUrl = window.location.origin;
@@ -14,6 +14,8 @@ export const starredArticlesURL = baseUrl + '/api/authenticate/starred';
 
 
 export const contactCreateListURL = baseUrl + '/api/emailwatch/contacts/';
+export const templateCreateListURL = baseUrl + '/api/emailwatch/templates/';
 export const groupCreateListURL = baseUrl + '/api/emailwatch/groups/';
-export const sendEmailListURl = baseUrl + '/api/emailwatch/sendemails/';
+export const sendEmailListURL = baseUrl + '/api/emailwatch/sendemails/';
 export const trackerURL = baseUrl + '/api/emailwatch/tracker/';
+export const LinkTrackerURL = baseUrl + '/api/emailwatch/linktracker/';

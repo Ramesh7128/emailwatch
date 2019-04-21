@@ -12,7 +12,7 @@ export const SENT_EMAILS_FAILURE = 'SENT_EMAILS_FAILURE';
 
 export function sendEmail(data) {
     const token = localStorage.getItem('token', '')
-    const url = constURL.sendEmailListURl;
+    const url = constURL.sendEmailListURL;
     return function (dispatch) {
         return new Promise((resolve, reject) => {
             dispatch({ type: SEND_EMAIL_START });
@@ -39,7 +39,7 @@ export function sendEmail(data) {
 
 export function getSentEmails() {
     let token = localStorage.getItem('token', '')
-    let url = constURL.sendEmailListURl;
+    let url = constURL.sendEmailListURL;
     return function (dispatch) {
         dispatch({ type: SENT_EMAILS_START })
         axios.get(url, { headers: { Authorization: `Token ${token}` } })
@@ -49,7 +49,6 @@ export function getSentEmails() {
                     type: SENT_EMAILS_SUCCESS,
                     payload: response.data
                 });
-            
             })
             .catch(error=> {
                 dispatch({

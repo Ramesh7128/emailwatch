@@ -39,8 +39,8 @@ class SentEmail extends Component {
                                     <Table.Cell>{email.subject}</Table.Cell>
                                     <Table.Cell>{email.status}</Table.Cell>
                                     <Table.Cell>{email.read_status}</Table.Cell>
-                                    <Table.Cell>{email.creation_date}</Table.Cell>
-                                    <Table.Cell>{email.read_date}</Table.Cell>
+                                    <Table.Cell>{(()=>new Date(email.creation_date).toLocaleString())()}</Table.Cell>
+                                    <Table.Cell>{(()=>new Date(email.read_date).toLocaleString())()}</Table.Cell>
                                     <Table.Cell>
                                         <Icon name='trash alternate outline' onClick={this.handleClick} data-id={email.id} />
                                     </Table.Cell>

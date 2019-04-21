@@ -32,6 +32,7 @@ class Template(models.Model):
     name =  models.CharField(max_length=255)
     body = models.TextField()
     tags = models.ManyToManyField(Tag, related_name='tag')
+    user = models.ForeignKey(User, null=True, on_delete=models.CASCADE)
 
     def __str__(self):
         return self.name
@@ -61,5 +62,17 @@ class SentEmail(models.Model):
 
     def __str_(self):
         return self.receiver
+
+
+class EmailLinks(models.Model):
+    email = models.ForeignKey(SentEmail, on_delete=models.SET_NULL, null=True)
+    link_url = models.URLField()
+    link_tracking_id = models.CharField(max_length=50, null=True)
+    clicked_status = models.BooleanField(default=False)
+    clicked_time = models.DateTimeField(null=True)
+
+    def __str__(self):
+        return self.link_url
+
 
 

@@ -5,3 +5,5 @@ GOOGLE_GET_TOKEN_URL =  "https://www.googleapis.com/oauth2/v4/token"
 
 GOOGLE_TOKEN_INFO_URL = 'https://www.googleapis.com/oauth2/v3/tokeninfo?access_token=%s'
 
+GOOGLE_RENEW_TOKEN_URL = 'https://www.googleapis.com/oauth2/v4/token'
+

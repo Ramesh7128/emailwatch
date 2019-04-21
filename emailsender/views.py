@@ -1,20 +1,23 @@
+import json
 from datetime import datetime
 from django.shortcuts import render
 from rest_framework.views import APIView
 from rest_framework import viewsets
 from authentication.models import User, UserSocialCredentials
-from emailsender.models import Contact, Group, Template, SentEmail
+from emailsender.models import Contact, Group, Template, SentEmail, EmailLinks
 from django.http import Http404
 from rest_framework.response import Response
+from django.http import HttpResponseRedirect
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from emailsender.serializers import (
     ContactListSerializer,
     GroupSerializer,
     TemplateListSerializer,
-    SentEmailListSerailizer
+    SentEmailListSerailizer,
 )
 from rest_framework import generics, status
-from emailsender.constants import GOOGLE_EMAIL_SEND_URL
+from emailsender.constants import GOOGLE_EMAIL_SEND_URL, GOOGLE_RENEW_TOKEN_URL
+from emailsender.helpers.helpers import renewToken
 
 import requests
 
@@ -148,8 +151,16 @@ class TemplateView(APIView):
     def post(self, request):
         data = request.POST.copy()
         name = data.get('name', '')
-        body = data.get('body', '')
-
+        body = data.get('value', '')
+        print(name, body, "check input")
+        if (name and body):
+            email_template = Template()
+            email_template.name = name
+            email_template.body = body
+            email_template.user = request.user
+            email_template.save()
+            serializer = TemplateListSerializer(email_template)
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
 
 class SendEmail(APIView):
 
@@ -289,20 +300,40 @@ class SentEmailview(APIView):
             sent_email.user = user
             sent_email.body = body
             sent_email.save()
-            return True
+            return sent_email
         else:
             return False
+
+    def create_sent_email_links(self, *args, **kwargs):
+        """
+        Create sent email links that are getting tracked
+        """
+        links = kwargs['links']
+        email_instance = kwargs['email_instance']
+        for link in links:
+            tracking_link = EmailLinks()
+            tracking_link.link_url = link['linkUrl']
+            tracking_link.link_tracking_id = link['linkId']
+            tracking_link.email = email_instance
+            tracking_link.save()
+        return True
 
     def post(self, request):
         data = request.POST.copy()
         to = data.get('to', '')
         body = data.get('body', '')
         subject = data.get('subject', '')
+        links = request.data.get('links', '')
+        links = json.loads(links)
+        print(type(links))
+        for link in links:
+            print(link, 'link URL')
         tracker_id = data.get('trackerId', '')
         user = request.user
         access_token = UserSocialCredentials.objects.get(
             user=user).access_token
         if (to and body):
+            # check access token validity
             sender = request.user.email
             encoded_message = self.create_message(
                 sender, to, subject, body)
@@ -312,7 +343,13 @@ class SentEmailview(APIView):
             headers['Content-Type'] = 'application/json'
             res = requests.post(GOOGLE_EMAIL_SEND_URL,
                                 json=encoded_message, headers=headers)
-            print(res.json())
+            if(res.status_code == 401):
+                # access_token failure.
+                access_token = renewToken(request.user)
+                auth_header = 'Bearer %s' % access_token
+                headers['Authorization'] = auth_header
+                res = requests.post(GOOGLE_EMAIL_SEND_URL,
+                                    json=encoded_message, headers=headers)
             if (res.status_code == 200):
                 # create a sent item entry.
                 data = {
@@ -323,7 +360,15 @@ class SentEmailview(APIView):
                     'subject': subject,
                     'tracker_id': tracker_id
                 }
-                self.create_sent_email(**data)
+                email_instance = self.create_sent_email(**data)
+                print(email_instance.id, "this is email_instance")
+                if (links):
+                    links_data = {
+                        'links': links,
+                        'email_instance': email_instance
+                    }
+                    print(links, 'check')
+                    self.create_sent_email_links(**links_data)
                 return Response('Successfully sent', status=status.HTTP_200_OK)
             else:
                 return Response('Email sending failed', status=status.HTTP_400_BAD_REQUEST)
@@ -331,6 +376,7 @@ class SentEmailview(APIView):
 
 class TrackEmailView(APIView):
     permission_classes = (AllowAny,)
+
     def get(self, request, slug=None):
         """
         Function to change the state of the email based on tracker id.
@@ -341,5 +387,19 @@ class TrackEmailView(APIView):
             sent_email.read_date = datetime.now()
             sent_email.save()
             return Response(status=status.HTTP_204_NO_CONTENT)
-        
-        
+
+
+class TrackEmailLinkView(APIView):
+    permission_classes = (AllowAny,)
+
+    def get(self, request, slug=None):
+        """
+        Funtion to monitor link click in email content.
+        """
+        if (slug):
+            email_link = EmailLinks.objects.get(link_tracking_id=slug)
+            email_link.clicked_time = datetime.now()
+            email_link.clicked_status = True
+            email_link.save()
+            redirect_url = email_link.link_url
+            return HttpResponseRedirect(redirect_to=redirect_url)

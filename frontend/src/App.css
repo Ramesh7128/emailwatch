@@ -334,6 +334,9 @@ a {
   margin: 10px;
 }
 
+.form-field-template {
+  margin: 10px 0;
+}
 /* .add-contact-form-section {
   width: 340px;
 } */

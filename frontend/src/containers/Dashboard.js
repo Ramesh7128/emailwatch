@@ -16,6 +16,7 @@ class Dashboard extends Component {
         this.setState({
             navbar: section
         });
+        
     }
 
     handleClick(event) {
@@ -34,9 +35,10 @@ class Dashboard extends Component {
                 <div className='left-navbar-section'>
                     <div className='list-container' onClick={this.handleClick}>
                         <div className='list-item'>{addBorderClass(this.state, 'Contacts')}</div>
-                        <div className='list-item'>{addBorderClass(this.state, 'SentEmail')}</div>
                         <div className='list-item'>{addBorderClass(this.state, 'Groups')}</div>
                         <div className='list-item'>{addBorderClass(this.state, 'Template')}</div>
+                        <div className='list-item'>{addBorderClass(this.state, 'SentEmail')}</div>
+                        <div className='list-item'>{addBorderClass(this.state, 'Analytics')}</div>
                         <div className='list-item'>{addBorderClass(this.state, 'NewEmail')}</div>
                     </div>
                 </div>
