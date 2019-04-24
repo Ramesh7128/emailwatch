@@ -1,9 +1,9 @@
 // development setup
 // export const baseUrl = 'http://localhost:8000';
-export const baseUrl = 'https://7241f427.ngrok.io';
+// export const baseUrl = 'https://d60e0b8e.ngrok.io';
 
 // production setup
-// export const baseUrl = window.location.origin;
+export const baseUrl = window.location.origin;
 
 
 export const authLoginURL =  baseUrl + '/api/authenticate/users/login';
